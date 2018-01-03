@@ -1,0 +1,115 @@
+---
+- hosts: 127.0.0.1
+  tasks:
+     - name: Download Apache Httpd package
+       get_url:
+          url: http://www.gtlib.gatech.edu/pub/apache//httpd/httpd-2.4.29.tar.gz
+          dest: /home/ubuntu
+
+     - name: Unarchive Apache HTTPD Package
+       unarchive:
+         src: /home/ubuntu/httpd-2.4.29.tar.gz
+         dest: /home/ubuntu
+         remote_src: yes
+
+     - name: Install Apache httpd
+       command: ./configure --prefix=/usr/local/apache    --enable-rewrite=shared  --enable-proxy=shared
+       args:
+         chdir: /home/ubuntu/httpd-2.4.29
+
+
+     - name: Install Apache httpd
+       command: make
+       args:
+         chdir: /home/ubuntu/httpd-2.4.29
+
+     - name: Install Apache httpd
+       command: make install
+       args:
+         chdir: /home/ubuntu/httpd-2.4.29
+
+
+     - name: Start Apache
+       shell: |
+            /usr/local/apache/bin/apachectl
+            sed -i '$i'"$(echo '/usr/local/apache/bin/apachectl')" /etc/rc.local
+
+
+     - name: Download Mod_Jk Installation Package
+       get_url:
+          url: http://mirrors.ibiblio.org/apache/tomcat/tomcat-connectors/jk/tomcat-connectors-1.2.42-src.tar.gz
+          dest: /home/ubuntu
+
+     - name: Unarchive Mod_jk Package
+       unarchive:
+         src: /home/ubuntu/tomcat-connectors-1.2.42-src.tar.gz
+         dest: /home/ubuntu
+         remote_src: yes
+
+     - name: Install Mod_jk connector
+       command: ./configure    --with-apxs=/usr/local/apache/bin/apxs
+       args:
+         chdir: /home/ubuntu/tomcat-connectors-1.2.42-src/native
+
+
+     - name: Install Mod_jk Connector
+       command: make
+       args:
+         chdir: /home/ubuntu/tomcat-connectors-1.2.42-src/native
+
+     - name: Install Mod_jk Connector
+       command: make install
+       args:
+         chdir: /home/ubuntu/tomcat-connectors-1.2.42-src/native
+
+     - file:
+          path: /etc/init.d/apachehttpd
+          state: touch
+          mode: 0777
+
+     - name: Inserts Configuration settings into apachehttpd.service file
+       shell: |
+              echo '#!/bin/bash' >> /etc/init.d/apachehttpd
+              echo  '### BEGIN INIT INFO' >> /etc/init.d/apachehttpd
+              echo  '# Provides:        apachehttpd' >> /etc/init.d/apachehttpd
+              echo  '# Required-Start:  $network' >> /etc/init.d/apachehttpd
+              echo  '# Required-Stop:   $network' >> /etc/init.d/apachehttpd
+              echo  '# Default-Start:   2 3 4 5' >> /etc/init.d/apachehttpd
+              echo  '# Default-Stop:    0 1 6' >> /etc/init.d/apachehttpd
+              echo  '# Short-Description: Start/Stop apachehttpd server' >> /etc/init.d/apachehttpd
+              echo  '### END INIT INFO' >> /etc/init.d/apachehttpd
+              echo  '' >> /etc/init.d/apachehttpd
+              echo  'PATH=/sbin:/bin:/usr/sbin:/usr/bin' >> /etc/init.d/apachehttpd
+              echo  '' >> /etc/init.d/apachehttpd
+              echo  'start() {' >> /etc/init.d/apachehttpd
+              echo  ' /usr/local/apache/bin/apachectl start' >> /etc/init.d/apachehttpd
+              echo  '}' >> /etc/init.d/apachehttpd
+              echo  '' >> /etc/init.d/apachehttpd
+              echo  'stop() {' >> /etc/init.d/apachehttpd
+              echo  ' /usr/local/apache/bin/apachectl stop' >> /etc/init.d/apachehttpd
+              echo  '}' >> /etc/init.d/apachehttpd
+              echo  '' >> /etc/init.d/apachehttpd
+              echo  'case $1 in' >> /etc/init.d/apachehttpd
+              echo  '  start|stop) $1;;' >> /etc/init.d/apachehttpd
+              echo  '  restart) stop; start;;' >> /etc/init.d/apachehttpd
+              echo  '  *) echo "Run as $0 <start|stop|restart>"; exit 1;;' >> /etc/init.d/apachehttpd
+              echo  'esac' >> /etc/init.d/apachehttpd
+
+
+     - name: Make apachehttpd service file executable
+       command: chmod +x /etc/init.d/apachehttpd
+
+     - name: Update Rc Defaults
+       command: update-rc.d tomcat4 defaults
+
+     - name: Starts apache
+       command: service apachehttpd start
+
+     - name: Start Apache and Tomcat automatically on stop/start
+       shell: |
+            sed -i '$i'"$(echo 'service apachehttpd start')" /etc/rc.local
+            sed -i '$i'"$(echo 'service tomcat start')" /etc/rc.local
+            sed -i '$i'"$(echo 'service tomcat1 start')" /etc/rc.local
+            sed -i '$i'"$(echo 'service tomcat2 start')" /etc/rc.local
+            sed -i '$i'"$(echo 'service tomcat3 start')" /etc/rc.local
+            sed -i '$i'"$(echo 'service tomcat4 start')" /etc/rc.local
