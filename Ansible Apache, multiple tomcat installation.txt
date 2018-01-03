@@ -1,0 +1,279 @@
+﻿---
+- hosts: ansibleslaves
+ tasks:
+    - name: Installs Java
+      remote_user: ubuntu
+      become: true
+      become_user: root
+      apt: pkg=default-jdk state=installed update_cache=true
+
+
+
+
+    - name: Installs libaprutil1-dev Apache Dependency
+      remote_user: ubuntu
+      become: true
+      become_user: root
+      apt: pkg=libaprutil1-dev state=installed update_cache=true
+
+
+
+
+    - name: Installs libapr1-dev Apache Dependency
+      remote_user: ubuntu
+      become: true
+      become_user: root
+      apt: pkg=libapr1-dev state=installed update_cache=true
+
+
+
+
+    - name: Installs gcc Apache dependency
+      remote_user: ubuntu
+      become: true
+      become_user: root
+     apt: pkg=gcc state=installed update_cache=true     apt: pkg=gcc state=installed update_cache=true
+
+
+
+
+    - name: Installs g++ Apache dependency
+      remote_user: ubuntu
+      become: true
+      become_user: root
+      apt: pkg=g++ state=installed update_cache=true
+
+
+
+
+    - name: Installs libpcre3 Apache Dependency
+      remote_user: ubuntu
+      become: true
+      become_user: root
+      apt: pkg=libpcre3 state=installed update_cache=true
+---
+- hosts: ansibleslaves
+ tasks:
+    - name: Installs Java
+      remote_user: ubuntu
+      become: true
+      become_user: root
+      apt: pkg=default-jdk state=installed update_cache=true
+
+
+
+
+    - name: Installs libaprutil1-dev Apache Dependency
+      remote_user: ubuntu
+      become: true
+      become_user: root
+      apt: pkg=libaprutil1-dev state=installed update_cache=true
+
+
+
+
+    - name: Installs libapr1-dev Apache Dependency
+      remote_user: ubuntu
+      become: true
+      become_user: root
+      apt: pkg=libapr1-dev state=installed update_cache=true
+
+
+
+
+    - name: Installs gcc Apache dependency
+      remote_user: ubuntu
+      become: true
+      become_user: root
+      apt: pkg=gcc state=installed update_cache=true
+
+
+
+
+    - name: Installs g++ Apache dependency
+      remote_user: ubuntu
+      become: true
+      become_user: root
+      apt: pkg=g++ state=installed update_cache=true
+
+
+
+
+    - name: Installs libpcre3 Apache Dependency
+      remote_user: ubuntu
+      become: true
+      become_user: root
+      apt: pkg=libpcre3 state=installed update_cache=true
+- name: Installs libpcre3-dev Apache Dependency
+      remote_user: ubuntu
+      become: true
+      become_user: root
+      apt: pkg=libpcre3-dev state=installed update_cache=true
+
+
+
+
+  - name: Installs make
+      remote_user: ubuntu
+      become: true
+      become_user: root
+      apt: pkg=make state=installed update_cache=true
+
+
+
+
+
+
+- name: installs First tomcat instance
+      remote_user: ubuntu
+      become: true
+      become_user: root
+      shell: |
+              groupadd tomcat
+              useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
+              wget http://www-eu.apache.org/dist/tomcat/tomcat-8/v8.5.23/bin/apache-tomcat-8.5.23.tar.gz
+              tar -xzvf apache-tomcat-8.5.23.tar.gz
+              mv apache-tomcat-8.5.23 tomcat
+              mv tomcat /opt
+              chgrp -R tomcat /opt/tomcat
+              chown -R tomcat /opt/tomcat
+              chmod -R 755 /opt/tomcat
+              touch /etc/systemd/system/tomcat.service
+              echo "[Unit]" >> /etc/systemd/system/tomcat.service
+              echo "Description=Apache Tomcat Web Server" >> /etc/systemd/system/tomcat.service
+              echo "After=network.target" >> /etc/systemd/system/tomcat.service
+              echo " " >> /etc/systemd/system/tomcat.service
+              echo "[Service]" >> /etc/systemd/system/tomcat.service
+              echo "Type=forking" >> /etc/systemd/system/tomcat.service
+              echo " " >> /etc/systemd/system/tomcat.servic
+              echo "Environment=JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre" >> /etc/systemd/system/tomcat.service
+              echo "Environment=CATALINA_PID=/opt/tomcat/temp/tomcat.pid" >> /etc/systemd/system/tomcat.service
+              echo "Environment=CATALINA_HOME=/opt/tomcat" >> /etc/systemd/system/tomcat.service
+              echo "Environment=CATALINA_BASE=/opt/tomcat" >> /etc/systemd/system/tomcat.service
+              echo "Environment='CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC'" >> /etc/systemd/system/tomcat.service
+              echo "Environment='JAVA_OPTS=-Djava.awt.headless=true" >> /etc/systemd/system/tomcat.service
+              echo "-Djava.security.egd=file:/dev/./urandom'" >> /etc/systemd/system/tomcat.service
+              echo " " >> /etc/systemd/system/tomcat.service
+              echo "ExecStart=/opt/tomcat/bin/startup.sh" >> /etc/systemd/system/tomcat.service
+              echo "ExecStop=/opt/tomcat/bin/shutdown.sh" >> /etc/systemd/system/tomcat.service
+              echo "User=tomcat" >> /etc/systemd/system/tomcat.service
+              echo "Group=tomcat" >> /etc/systemd/system/tomcat.service
+              echo "UMask=0007" >> /etc/systemd/system/tomcat.service
+              echo "RestartSec=15" >> /etc/systemd/system/tomcat.service
+              echo "Restart=always" >> /etc/systemd/system/tomcat.service
+              echo " " >> /etc/systemd/system/tomcat.service
+              echo "[Install]" >> /etc/systemd/system/tomcat.service
+              echo "WantedBy=multi-user.target" >> /etc/systemd/system/tomcat.service
+              sed -i '$i'"$(echo './/opt/tomcat/bin/startup.sh')" /etc/rc.local
+              systemctl daemon-reload
+              systemctl start tomcat
+               systemctl status tomcat
+              systemctl enable tomcat
+              ufw allow 8080
+              cp -r /dspace/webapps/* /opt/tomcat/webapps
+
+
+
+
+    - name: installs Apache httpd
+      remote_user: ubuntu
+      become: true
+      become_user: root
+      shell: |
+              wget http://www.gtlib.gatech.edu/pub/apache//httpd/httpd-2.4.29.tar.gz
+              tar -xzvf httpd-2.4.29.tar.gz
+              cd httpd-2.4.29
+              ./configure --prefix=/usr/local/apache    --enable-rewrite=shared  --enable-proxy=shared
+              make
+              make install
+              /usr/local/apache/bin/apachectl
+
+
+
+
+    - name: installs Mod_Jk connector and Second tomcat Instance
+      remote_user: ubuntu
+      become: true
+      become_user: root
+      shell: |
+             wget http://mirrors.ibiblio.org/apache/tomcat/tomcat-connectors/jk/tomcat-connectors-1.2.42-src.tar.gz
+             tar -xzvf tomcat-connectors-1.2.42-src.tar.gz
+             cd tomcat-connectors-1.2.42-src
+             cd native
+             ./configure    --with-apxs=/usr/local/apache/bin/apxs
+             make
+             make install
+             touch /usr/local/apache/conf/workers.properties
+             echo "worker.tomcat.type=ajp13" >> /usr/local/apache/conf/workers.properties
+             echo "worker.tomcat.host=localhost" >> /usr/local/apache/conf/workers.properties
+             echo "worker.tomcat.port=8009" >> /usr/local/apache/conf/workers.properties
+             echo "worker.tomcat1.type=ajp13" >> /usr/local/apache/conf/workers.properties
+             echo "worker.tomcat1.host=localhost" >> /usr/local/apache/conf/workers.properties
+             echo "worker.tomcat1.port=8109" >> /usr/local/apache/conf/workers.properties
+             cd /opt
+             mkdir tomcat1
+              cp -a /opt/tomcat/conf tomcat1
+             cp -a /opt/tomcat/logs tomcat1
+             cp -a /opt/tomcat/webapps tomcat1
+             cp -a /opt/tomcat/work tomcat1
+             cp -a /opt/tomcat/temp tomcat1
+             rm /opt/tomcat1/temp/tomcat.pid
+             cd  /opt/tomcat1/conf
+             sed -i 's/Server port="8005"/Server port="8105"/g' server.xml
+             sed -i 's/Connector port="8080"/Connector port="8181"/g' server.xml
+             sed -i 's/Connector port="8009"/Connector port="8109"/g' server.xml
+             cd /opt
+             touch startup1.sh
+             touch shutdown1.sh
+             echo "#!/bin/bash" >> startup1.sh
+             echo "export CATALINA_BASE=/opt/tomcat1" >> startup1.sh
+             echo "cd /opt/tomcat/bin" >> startup1.sh
+             echo "./startup.sh" >> startup1.sh
+             echo "#!/bin/bash" >> shutdown1.sh
+             echo "export CATALINA_BASE=/opt/tomcat1" >> shutdown1.sh
+             echo "cd /opt/tomcat/bin" >> shutdown1.sh
+             echo "./shutdown.sh" >> shutdown1.sh
+             chmod 777 startup1.sh
+             chmod 777 shutdown1.sh
+             chown -R tomcat /opt/tomcat1
+             chmod -R 755 /opt/tomcat1
+             touch /etc/systemd/system/tomcat1.service
+             echo "[Unit]" >> /etc/systemd/system/tomcat1.service
+             echo "Description=Apache Tomcat Web Server" >> /etc/systemd/system/tomcat1.service
+             echo "After=network.target" >> /etc/systemd/system/tomcat1.service
+             echo " " >> /etc/systemd/system/tomcat1.service
+             echo "[Service]" >> /etc/systemd/system/tomcat1.service
+             echo "Type=forking" >> /etc/systemd/system/tomcat1.service
+             echo " " >> /etc/systemd/system/tomcat1.service
+             echo "Environment=JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre" >> /etc/systemd/system/tomcat1.service
+             echo "Environment=CATALINA_PID=/opt/tomcat1/temp/tomcat.pid" >> /etc/systemd/system/tomcat1.service
+             echo "Environment=CATALINA_HOME=/opt/tomcat" >> /etc/systemd/system/tomcat1.service
+             echo "Environment=CATALINA_BASE=/opt/tomcat1" >> /etc/systemd/system/tomcat1.service
+             echo "Environment='CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC'" >> /etc/systemd/system/tomcat1.service
+             echo "Environment='JAVA_OPTS=-Djava.awt.headless=true" >> /etc/systemd/system/tomcat1.service
+             echo "-Djava.security.egd=file:/dev/./urandom'" >> /etc/systemd/system/tomcat1.service
+             echo " " >> /etc/systemd/system/tomcat1.service
+             echo "ExecStart=/opt/startup1.sh" >> /etc/systemd/system/tomcat1.service
+             echo "ExecStop=/opt/shutdown1.sh" >> /etc/systemd/system/tomcat1.service
+             echo "User=tomcat" >> /etc/systemd/system/tomcat1.service
+             echo "Group=tomcat" >> /etc/systemd/system/tomcat1.service
+             echo "UMask=0007" >> /etc/systemd/system/tomcat1.service
+             echo "RestartSec=15" >> /etc/systemd/system/tomcat1.service
+             echo "Restart=always" >> /etc/systemd/system/tomcat1.service
+             echo " " >> /etc/systemd/system/tomcat1.service
+             echo "[Install]" >> /etc/systemd/system/tomcat1.service
+             echo "WantedBy=multi-user.target" >> /etc/systemd/system/tomcat1.service
+             sed -i '$i'"$(echo './/opt/startup1.sh')" /etc/rc.local
+             systemctl daemon-reload
+             systemctl start tomcat1
+             systemctl enable tomcat1
+             ufw allow 8181
+             echo "LoadModule    jk_module  modules/mod_jk.so" >> /usr/local/apache/conf/httpd.conf
+             echo "JkWorkersFile conf/workers.properties" >> /usr/local/apache/conf/httpd.conf
+             echo "JkLogFile     logs/mod_jk.log" >> /usr/local/apache/conf/httpd.conf
+             echo "JkLogLevel    emerg" >> /usr/local/apache/conf/httpd.conf
+             echo "JkLogStampFormat '[%a %b %d %H:%M:%S %Y]'" >> /usr/local/apache/conf/httpd.conf
+             echo "JkOptions     +ForwardKeySize +ForwardURICompat -ForwardDirectories" >> /usr/local/apache/conf/httpd.conf
+             echo "JkRequestLogFormat     '%w %V %T'" >> /usr/local/apache/conf/httpd.conf
+             echo "JkMount  /department1 tomcat" >> /usr/local/apache/conf/httpd.conf
+             echo "JkMount  /department2  tomcat2" >> /usr/local/apache/conf/httpd.conf
