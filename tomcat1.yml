@@ -22,7 +22,7 @@
          mode: 0755
 
      - file:
-         path: /etc/init.d/tomcat
+         path: /etc/init.d/tomcat.service
          state: touch
          
      - name: Inserts Configuration settings into tomcat.service file
